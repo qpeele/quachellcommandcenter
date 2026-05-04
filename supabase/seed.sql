@@ -1,0 +1,2 @@
+-- Insert into tables after creating a user profile in Supabase Auth.
+-- Example: insert into books (user_id,title,status) values ('<uuid>','Hot Mess in Heels','Drafting');

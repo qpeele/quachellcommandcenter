@@ -1,0 +1,17 @@
+create extension if not exists "uuid-ossp";
+create table profiles (id uuid primary key references auth.users(id) on delete cascade, full_name text, created_at timestamptz default now());
+create table books (id uuid primary key default uuid_generate_v4(), user_id uuid not null references profiles(id) on delete cascade, title text not null, series text, genre text, status text, word_count int default 0, next_step text, launch_date date, notes text, created_at timestamptz default now());
+create table tasks (id uuid primary key default uuid_generate_v4(), user_id uuid not null references profiles(id) on delete cascade, task_name text not null, category text, linked_to_type text, linked_to_name text, priority text, status text, due_date date, owner text, notes text, created_at timestamptz default now());
+create table businesses (id uuid primary key default uuid_generate_v4(), user_id uuid not null references profiles(id) on delete cascade, name text not null, leads int default 0, clients int default 0, proposals int default 0, contracts int default 0, revenue numeric default 0, follow_ups text, notes text, created_at timestamptz default now());
+create table money_entries (id uuid primary key default uuid_generate_v4(), user_id uuid not null references profiles(id) on delete cascade, type text, category text, amount numeric, date date, notes text, created_at timestamptz default now());
+create table launches (id uuid primary key default uuid_generate_v4(), user_id uuid not null references profiles(id) on delete cascade, launch_name text, product text, platform text, launch_date date, status text, checklist text, revenue_goal numeric, notes text, created_at timestamptz default now());
+create table notes (id uuid primary key default uuid_generate_v4(), user_id uuid not null references profiles(id) on delete cascade, title text, category text, body text, linked_to text, created_at timestamptz default now());
+alter table profiles enable row level security; alter table books enable row level security; alter table tasks enable row level security; alter table businesses enable row level security; alter table money_entries enable row level security; alter table launches enable row level security; alter table notes enable row level security;
+create policy own_select on profiles for select using (auth.uid()=id);
+create policy own_write on profiles for all using (auth.uid()=id) with check (auth.uid()=id);
+create policy books_own on books for all using (auth.uid()=user_id) with check (auth.uid()=user_id);
+create policy tasks_own on tasks for all using (auth.uid()=user_id) with check (auth.uid()=user_id);
+create policy businesses_own on businesses for all using (auth.uid()=user_id) with check (auth.uid()=user_id);
+create policy money_own on money_entries for all using (auth.uid()=user_id) with check (auth.uid()=user_id);
+create policy launches_own on launches for all using (auth.uid()=user_id) with check (auth.uid()=user_id);
+create policy notes_own on notes for all using (auth.uid()=user_id) with check (auth.uid()=user_id);
